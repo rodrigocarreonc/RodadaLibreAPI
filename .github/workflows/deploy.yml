@@ -1,0 +1,54 @@
+name: Deploy Laravel API to HostGator
+
+on:
+  push:
+    branches:
+      - main  # Execute on push in main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: PHP and Composer configuration
+      - name: Set up PHP and install Composer dependencies
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, bcmath, zip, mysqli
+          coverage: none
+
+      # Step 3: Install Composer Dependencies
+      - name: Install Composer dependencies
+        run: |
+          curl -sS https://getcomposer.org/installer | php
+          php composer.phar install --no-dev --optimize-autoloader --prefer-dist
+
+      # Step 4: Remove large directories
+      - name: Cleanup node_modules
+        run:  |
+          rm -rf node_modules/
+          rm -rf vendor/
+      
+      - name: Upload files via SFTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          local-dir: ./ 
+          server-dir: /  # Target directory on server
+          exclude: |
+            .git*
+            .github/
+            .env
+            node_modules/
+            vendor/
+            test/
+            *md
+            storage/logs/*
