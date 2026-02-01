@@ -1,0 +1,46 @@
+# --- Logs y Temporales ---
+*.log
+.phpunit.result.cache
+.phpunit.cache
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+.DS_Store
+Thumbs.db
+
+# --- Archivos de Configuración Sensibles ---
+.env
+.env.backup
+.env.production
+/auth.json
+.phpactor.json
+Homestead.json
+Homestead.yaml
+
+# --- Dependencias ---
+/node_modules
+/vendor
+
+# --- Archivos Generados y Assets ---
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+
+# --- IMPORTANTE: Mantener estructura de carpetas en Git ---
+# Esto asegura que las carpetas existan en el host pero estén vacías
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+
+# Excepciones para no borrar los archivos .gitignore dentro de storage
+!storage/framework/cache/data/.gitignore
+!storage/framework/sessions/.gitignore
+!storage/framework/testing/.gitignore
+!storage/framework/views/.gitignore
+!storage/logs/.gitignore
