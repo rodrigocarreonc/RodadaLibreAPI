@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Place;
 use Illuminate\Http\Request;
 
+use App\Http\Resources\PlaceResource;
+
 class PlaceController extends Controller
 {
     /**
@@ -19,7 +21,7 @@ class PlaceController extends Controller
             $places = $places->where('category_id', $categoryId)->values();
         }
         
-        return response()->json($places);
+        return PlaceResource::collection($places);
     }
 
     /**
