@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Place;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 use App\Http\Resources\PlaceResource;
 
@@ -37,7 +38,29 @@ class PlaceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try{
+            $data = $request->validate(Place::createValidation(), Place::createMessageErrors());
+
+            $place = Place::create(collect($data)->except('photo_ids')->toArray());
+
+            // Associate photos with place by id
+            if (!empty($request->photo_ids)) {
+                Photo::withoutGlobalScope('approved')
+                    ->whereIn('id', $request->photo_ids)
+                    ->update(['place_id' => $place->id, 'status' => 'approved']);
+            }
+
+            return response()->json([
+                "message" => "Place created successfully",
+                "place" => new PlaceResource($place->load('category', 'photos'))
+            ], 201);
+        }
+        catch(ValidationException $e){
+            return response()->json([
+                "message" => "Validation failed",
+                "errors" => $e->errors()
+            ], 422);
+        }
     }
 
     /**
