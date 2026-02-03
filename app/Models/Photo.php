@@ -19,4 +19,19 @@ class Photo extends Model
     public function place(){
         return $this->belongsTo(Place::class);
     }
+
+    public static function createValidation(){
+        return [
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:5120'
+        ];
+    }
+
+    public static function createMessageErrors(){
+        return [
+            'image.required' => 'Image file is required.',
+            'image.image' => 'The file must be an image.',
+            'image.mimes' => 'The image must be a file of type: jpeg, png, jpg.',
+            'image.max' => 'The image size must not exceed 5MB.'
+        ];
+    }
 }

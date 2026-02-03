@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Place;
+use App\Models\Photo;
+
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
