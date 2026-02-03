@@ -12,7 +12,13 @@ class PlaceController extends Controller
      */
     public function index(Request $request)
     {
-        $places = Place::all();
+        $places = Place::all()->load('category', 'photos');
+
+        if ($request->has('category')) {
+            $categoryId = $request->query('category');
+            $places = $places->where('category_id', $categoryId)->values();
+        }
+        
         return response()->json($places);
     }
 
