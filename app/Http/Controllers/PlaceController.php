@@ -41,7 +41,7 @@ class PlaceController extends Controller
     public function store(Request $request)
     {
         try{
-            $data = $request->validate(Place::createValidation(), Place::createMessageErrors());
+            $data = $request->validate(Place::validations(), Place::messageErrors());
 
             $place = Place::create(collect($data)->except('photo_ids')->toArray());
 
@@ -95,7 +95,7 @@ class PlaceController extends Controller
                 ], 404);
             }
 
-            $data = $request->validate(Place::createValidation(), Place::createMessageErrors());
+            $data = $request->validate(Place::validations(), Place::messageErrors());
 
             $currentPhotoIds = $place->photos->pluck('id')->toArray();
             $newPhotoIds = $request->photo_ids ?? [];

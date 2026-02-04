@@ -27,7 +27,7 @@ class Place extends Model
         return $this->hasMany(Photo::class);
     }
 
-    public static function createValidation(){
+    public static function validations(){
         return [
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:100',
@@ -45,7 +45,7 @@ class Place extends Model
         ];
     }
 
-    public static function createMessageErrors(){
+    public static function messageErrors(){
         return [
             'category_id.required' => 'Category is required.',
             'category_id.exists' => 'The selected category does not exist.',
