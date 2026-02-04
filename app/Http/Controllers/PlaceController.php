@@ -70,7 +70,7 @@ class PlaceController extends Controller
      */
     public function show(Place $place)
     {
-        //
+        return new PlaceResource($place->load('category', 'photos'));
     }
 
     /**
@@ -84,9 +84,50 @@ class PlaceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Place $place)
+    public function update(Request $request, $id)
     {
-        //
+        try{
+            $place = Place::find($id);
+
+            if( !$place ){
+                return response()->json([
+                    "message" => "Place not found"
+                ], 404);
+            }
+
+            $data = $request->validate(Place::createValidation(), Place::createMessageErrors());
+
+            $currentPhotoIds = $place->photos->pluck('id')->toArray();
+            $newPhotoIds = $request->photo_ids ?? [];
+
+            $photosIdsToDessociate = array_diff($currentPhotoIds, $newPhotoIds);
+
+            if(!empty($photosIdsToDessociate)){
+                Photo::withoutGlobalScope('approved')
+                ->whereIn('id', $photosIdsToDessociate)
+                ->update(['place_id' => null, 'status' => 'pending']);
+            }
+
+            $place->update(collect($data)->except('photo_ids')->toArray());
+
+            if (!empty($request->photo_ids)){
+                Photo::withoutGlobalScope('approved')
+                    ->whereIn('id', $request->photo_ids)
+                    ->update(['place_id' => $place->id, 'status' => 'approved']);
+            }
+            
+            return response()->json([
+                "message" => "Place updated successfully",
+                "place" => new PlaceResource($place->load('category', 'photos'))
+            ], 200);
+
+        }
+        catch(ValidationException $e){
+            return response()->json([
+                "message" => "Validation failed",
+                "errors" => $e->errors()
+            ], 422);
+        }
     }
 
     /**

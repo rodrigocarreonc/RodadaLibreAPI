@@ -11,4 +11,6 @@ Route::prefix('v1')->group(function (){
 
     Route::post('/places', [PlaceController::class, 'store']);
     Route::post('/photos/upload', [PhotoController::class, 'upload']);
+    
+    Route::put('/places/{place}', [PlaceController::class, 'update']);
 });
