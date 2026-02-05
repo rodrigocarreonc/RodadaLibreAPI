@@ -10,11 +10,15 @@ use App\Http\Controllers\AuthController;
 Route::prefix('v1')->group(function (){
     Route::get('/places', [PlaceController::class, 'index']);
 
-    Route::post('/places', [PlaceController::class, 'store']);
-    Route::post('/photos/upload', [PhotoController::class, 'upload']);
-    
-    Route::put('/places/{place}', [PlaceController::class, 'update']);
-    Route::delete('/places/{place}', [PlaceController::class, 'destroy']);
+    Route::group([
+        'middleware' => 'auth:api'
+    ],function ($router){
+        Route::post('/places', [PlaceController::class, 'store']);
+        Route::post('/photos/upload', [PhotoController::class, 'upload']);
+            
+        Route::put('/places/{place}', [PlaceController::class, 'update']);
+        Route::delete('/places/{place}', [PlaceController::class, 'destroy']);
+    });
 
     Route::group([
         'middleware' => 'api',
