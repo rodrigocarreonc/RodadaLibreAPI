@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Place;
 use App\Models\Photo;
+use App\Models\ChangeRequest;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -43,19 +44,32 @@ class PlaceController extends Controller
         try{
             $data = $request->validate(Place::validations(), Place::messageErrors());
 
-            $place = Place::create(collect($data)->except('photo_ids')->toArray());
+            $user = auth()->user();
+            if($user->hasRole('admin')){
+                $place = Place::create(collect($data)->except('photo_ids')->toArray());
 
-            // Associate photos with place by id
-            if (!empty($request->photo_ids)) {
-                Photo::withoutGlobalScope('approved')
-                    ->whereIn('id', $request->photo_ids)
-                    ->update(['place_id' => $place->id, 'status' => 'approved']);
+                // Associate photos with place by id
+                if (!empty($request->photo_ids)) {
+                    Photo::withoutGlobalScope('approved')
+                        ->whereIn('id', $request->photo_ids)
+                        ->update(['place_id' => $place->id, 'status' => 'approved']);
+                }
+
+                return response()->json([
+                    "message" => "Place created successfully",
+                    "place" => new PlaceResource($place->load('category', 'photos'))
+                ], 201);
             }
 
+            ChangeRequest::create([
+                'user_id' => $user->id,
+                'action_type' => 'create',
+                'payload' => $data,
+            ]);
+
             return response()->json([
-                "message" => "Place created successfully",
-                "place" => new PlaceResource($place->load('category', 'photos'))
-            ], 201);
+                "message" => "Thanks! Your request has been submitted successfully"
+            ], 202);
         }
         catch(ValidationException $e){
             return response()->json([

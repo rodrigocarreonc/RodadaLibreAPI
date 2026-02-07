@@ -8,7 +8,11 @@ class ChangeRequest extends Model
 {
     protected $table = 'change_requests';
 
-    protected $filable = ['action_type', 'payload', 'status', 'admin_comment', 'user_id', 'place_id'];
+    protected $fillable = ['action_type', 'payload', 'status', 'admin_comment', 'user_id', 'place_id'];
+
+    protected $casts = [
+        'payload' => 'array', 
+    ];
 
     public function user()
     {
