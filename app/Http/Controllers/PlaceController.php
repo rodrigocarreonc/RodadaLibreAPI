@@ -111,30 +111,43 @@ class PlaceController extends Controller
 
             $data = $request->validate(Place::validations(), Place::messageErrors());
 
-            $currentPhotoIds = $place->photos->pluck('id')->toArray();
-            $newPhotoIds = $request->photo_ids ?? [];
+            $user = auth()->user();
+            if($user->hasRole('admin')){
+                $currentPhotoIds = $place->photos->pluck('id')->toArray();
+                $newPhotoIds = $request->photo_ids ?? [];
 
-            $photosIdsToDessociate = array_diff($currentPhotoIds, $newPhotoIds);
+                $photosIdsToDessociate = array_diff($currentPhotoIds, $newPhotoIds);
 
-            if(!empty($photosIdsToDessociate)){
-                Photo::withoutGlobalScope('approved')
-                ->whereIn('id', $photosIdsToDessociate)
-                ->update(['place_id' => null, 'status' => 'pending']);
+                if(!empty($photosIdsToDessociate)){
+                    Photo::withoutGlobalScope('approved')
+                    ->whereIn('id', $photosIdsToDessociate)
+                    ->update(['place_id' => null, 'status' => 'pending']);
+                }
+
+                $place->update(collect($data)->except('photo_ids')->toArray());
+
+                if (!empty($request->photo_ids)){
+                    Photo::withoutGlobalScope('approved')
+                        ->whereIn('id', $request->photo_ids)
+                        ->update(['place_id' => $place->id, 'status' => 'approved']);
+                }
+                
+                return response()->json([
+                    "message" => "Place updated successfully",
+                    "place" => new PlaceResource($place->load('category', 'photos'))
+                ], 200);
             }
 
-            $place->update(collect($data)->except('photo_ids')->toArray());
+            ChangeRequest::create([
+                'user_id' => $user->id,
+                'place_id' => $place->id,
+                'action_type' => 'update',
+                'payload' => $data,
+            ]);
 
-            if (!empty($request->photo_ids)){
-                Photo::withoutGlobalScope('approved')
-                    ->whereIn('id', $request->photo_ids)
-                    ->update(['place_id' => $place->id, 'status' => 'approved']);
-            }
-            
             return response()->json([
-                "message" => "Place updated successfully",
-                "place" => new PlaceResource($place->load('category', 'photos'))
-            ], 200);
-
+                "message" => "Thanks! Your request has been submitted successfully"
+            ], 202);
         }
         catch(ValidationException $e){
             return response()->json([
