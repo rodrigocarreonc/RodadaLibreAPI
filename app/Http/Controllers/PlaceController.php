@@ -163,6 +163,7 @@ class PlaceController extends Controller
     public function destroy($id)
     {
         $place = Place::find($id);
+        $user = auth()->user();
 
         if(!$place){
             return response()->json([
@@ -170,8 +171,34 @@ class PlaceController extends Controller
             ], 404);
         }
 
+        if($user->hasRole('admin')){
+            $place->delete();
+            return response()->json([
+                "message" => "Place deleted successfully"
+            ], 200);
+        }
+
+        $pending = ChangeRequest::where('place_id', $place->id)
+                    ->where('user_id', $user->id)
+                    ->where('status', 'pending')
+                    ->where('action_type', 'delete')
+                    ->exists();
+
+        if($pending){
+            return response()->json([
+                "message" => "You already have a pending delete request for this place"
+            ], 409);
+        }
+
+        ChangeRequest::create([
+            'user_id' => $user->id,
+            'place_id' => $place->id,
+            'action_type' => 'delete',
+            'payload' => null,
+        ]);
+
         return response()->json([
-            "message" => "Place deleted successfully"
-        ], 200);
+            "message" => "Thanks! Your delete request has been submitted successfully" 
+        ], 202);
     }
 }
