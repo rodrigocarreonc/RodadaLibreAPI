@@ -80,8 +80,38 @@ class ChangeRequestController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ChangeRequest $changeRequest)
+    public function reject(Request $request, $id)
     {
-        //
+        $changeRequest = ChangeRequest::find($id);
+
+        if(!$changeRequest){
+            return response()->json(['message' => 'Request not found'], 404);
+        }
+
+        if($changeRequest->status !== 'pending'){
+            return response()->json(['message' => 'Request already processed'], 400);
+        }
+
+        if(isset($changeRequest->payload['photos_ids'])){
+            $photos = Photo::withoutGlobalScope('approved')
+                    ->whereIn('id', $changeRequest->payload['photos_ids'])
+                    ->get();
+            
+            foreach ($photos as $photo) {
+                $path = str_replace(asset('storage/'), '', $photo->url_source);
+                Storage::disk('public')->delete($path);
+                $photo->delete();
+                    
+            }
+        }
+
+        $changeRequest->update([
+            'status' => 'rejected',
+            'admin_comment' => $request->input('admin_comment', 'No comment provided')
+        ]);
+
+        return response()->json([
+            "message" => "Change request rejected successfully"
+        ], 200);
     }
 }
