@@ -6,6 +6,7 @@ use App\Models\ChangeRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RequestResource;
+use App\Models\Place;
 
 class ChangeRequestController extends Controller
 {
@@ -42,33 +43,38 @@ class ChangeRequestController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function approve($id)
     {
-        //
-    }
+        $request = ChangeRequest::findOrFail($id);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ChangeRequest $changeRequest)
-    {
-        //
-    }
+        if($request->status !== 'pending'){
+            return response()->json(['message' => 'Request already processed'], 400);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ChangeRequest $changeRequest)
-    {
-        //
-    }
+        $data = $request->payload;
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ChangeRequest $changeRequest)
-    {
-        //
+        if($request->action_type === 'create'){
+            $place = Place::create(collect($data)->except('photos_ids')->toArray());
+            $this->syncPhotos($place->$id, $data['photos_ids'] ?? []);
+        }
+
+        else if($request->action_type === 'update'){
+            $place = Place::findOrFail($request->place_id);
+            $place->update(collect($data)->except('photos_ids')->toArray());
+            $this->syncPhotos($place->$id, $data['photos_ids'] ?? []);
+        }
+
+        else if($request->action_type === 'delete'){
+            $place = Place::findOrFail($request->place_id);
+            $place->delete();
+        }
+
+        $request->update(['status' => 'approved']);
+
+        return response()->json([
+            "message" => "Change request approved and applied successfully"
+        ], 200);
+
     }
 
     /**
