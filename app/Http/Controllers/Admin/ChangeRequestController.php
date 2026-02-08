@@ -114,4 +114,16 @@ class ChangeRequestController extends Controller
             "message" => "Change request rejected successfully"
         ], 200);
     }
+
+    private function syncPhotos($placeId, $photoIds)
+    {
+        if (!empty($photoIds)) {
+            Photo::withoutGlobalScope('approved')
+                ->whereIn('id', $photoIds)
+                ->update([
+                    'place_id' => $placeId,
+                    'status' => 'approved'
+                ]);
+        }
+    }
 }
