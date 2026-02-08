@@ -12,13 +12,23 @@ class ChangeRequestController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $requests = ChangeRequest::where('status', 'pending')
+        $changeRequests = ChangeRequest::where('status', 'pending')
         ->with(['user','place'])
         ->orderBy('created_at', 'asc')->get();
 
-        return RequestResource::collection($requests);
+        if($request->has('status')){
+            $status = $request->query('status');
+            $changeRequests = $changeRequests->where('status', $status)->values();
+        }
+
+        if($request->has('action')){
+            $action = $request->query('action');
+            $changeRequests = $changeRequests->where('action_type', $action)->values();
+        }
+
+        return RequestResource::collection($changeRequests);
     }
 
     /**
