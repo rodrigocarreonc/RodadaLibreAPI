@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\ChangeRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\RequestResource;
 
 class ChangeRequestController extends Controller
 {
@@ -14,10 +15,10 @@ class ChangeRequestController extends Controller
     public function index()
     {
         $requests = ChangeRequest::where('status', 'pending')
-        ->with(['user:id, name','place:id, name'])
+        ->with(['user','place'])
         ->orderBy('created_at', 'asc')->get();
 
-        return response()->json($requests);
+        return RequestResource::collection($requests);
     }
 
     /**
