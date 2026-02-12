@@ -45,7 +45,7 @@ class PlaceController extends Controller
             $data = $request->validate(Place::validations(), Place::messageErrors());
 
             $user = auth()->user();
-            if($user->hasRole('admin')){
+            if($user->hasAnyRole(['admin', 'moderator'])){
                 $place = Place::create(collect($data)->except('photo_ids')->toArray());
 
                 // Associate photos with place by id
@@ -112,7 +112,7 @@ class PlaceController extends Controller
             $data = $request->validate(Place::validations(), Place::messageErrors());
 
             $user = auth()->user();
-            if($user->hasRole('admin')){
+            if($user->hasAnyRole(['admin', 'moderator'])){
                 $currentPhotoIds = $place->photos->pluck('id')->toArray();
                 $newPhotoIds = $request->photo_ids ?? [];
 
@@ -171,7 +171,7 @@ class PlaceController extends Controller
             ], 404);
         }
 
-        if($user->hasRole('admin')){
+        if($user->hasAnyRole(['admin', 'moderator'])){
             $place->delete();
             return response()->json([
                 "message" => "Place deleted successfully"
