@@ -18,7 +18,7 @@ Route::prefix('v1')->group(function (){
         
         Route::post('/photos/upload', [PhotoController::class, 'upload']);
 
-        Route::middleware(['role:admin'])->prefix('admin')->group(function(){
+        Route::middleware(['role:admin|moderator'])->prefix('moderation')->group(function(){
             Route::get('/requests', [ChangeRequestController::class, 'index']);
             Route::post('/requests/{id}/approve', [ChangeRequestController::class, 'approve']);
             Route::post('/requests/{id}/reject', [ChangeRequestController::class, 'reject']);
