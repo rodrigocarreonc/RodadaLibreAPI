@@ -67,4 +67,17 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public static function validations(){
+        return [
+            "role" => "required|exists:roles,name",
+        ];
+    }
+
+    public static function messageErrors(){
+        return [
+            "role.required" => "The role field is required.",
+            "role.exists" => "The selected role is invalid.",
+        ];
+    }
 }

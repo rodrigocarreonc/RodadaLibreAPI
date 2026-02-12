@@ -27,6 +27,7 @@ Route::prefix('v1')->group(function (){
 
         Route::middleware(['role:admin'])->prefix('admin')->group(function(){
             Route::get('/users', [UserRoleController::class, 'index']);
+            Route::put('/users/{id}/role', [UserRoleController::class, 'updateRole']);
         });
     });
 
