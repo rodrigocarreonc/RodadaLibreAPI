@@ -7,6 +7,7 @@ use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\ChangeRequestController;
+use App\Http\Controllers\Admin\UserRoleController;
 
 Route::prefix('v1')->group(function (){
     Route::get('/places', [PlaceController::class, 'index']);
@@ -22,6 +23,10 @@ Route::prefix('v1')->group(function (){
             Route::get('/requests', [ChangeRequestController::class, 'index']);
             Route::post('/requests/{id}/approve', [ChangeRequestController::class, 'approve']);
             Route::post('/requests/{id}/reject', [ChangeRequestController::class, 'reject']);
+        });
+
+        Route::middleware(['role:admin'])->prefix('admin')->group(function(){
+            Route::get('/users', [UserRoleController::class, 'index']);
         });
     });
 
