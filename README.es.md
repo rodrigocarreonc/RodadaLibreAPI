@@ -23,8 +23,8 @@ El núcleo del sistema es la integridad de los datos geográficos. Para garantiz
 ```mermaid
 graph TD
     User((Ciclista)) -->|POST /places| API{Tiene Rol?}
-    API -->|No (User)| DB1[(ChangeRequests)]
-    API -->|Si (Mod/Admin)| DB2[(Places)]
+    API --"No (User)" --> DB1[(ChangeRequests)]
+    API --"Si (Mod/Admin)" --> DB2[(Places)]
     
     DB1 -->|Pendiente| Moderator((Moderador))
     Moderator -->|Approve| DB2
