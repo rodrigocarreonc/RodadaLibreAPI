@@ -5,13 +5,15 @@
 ![Laravel](https://img.shields.io/badge/Laravel-12.x-red)
 ![PHP](https://img.shields.io/badge/PHP-8.2-purple)
 
+> 🇪🇸 **Español**: Lee este documento en español [aquí](./README.es.md).
+
 RESTful Backend designed for the [**Rodada Libre**](https://rodadalibre.github.io/), mobile app, soon available on the Google Play Store. This API handles geospatial services for urban cyclists, secure authentication, and a collaborative content moderation system.
 
 ## 📋 Table of Contents
 - [Architecture & Workflow](#-architecture--workflow)
 - [Tech Stack](#-tech-stack)
 - [Local Installation](#-local-installation)
-- [Production Deployment](#-security--roles)
+- [Security & Roles](#-security--roles)
 
 
 ## 🏗 Architecture & Workflow
@@ -89,7 +91,7 @@ php artisan migrate --seed
 # This creates initial places and the roles of a user, moderator, and administrator.
 ```
 
-## 🛡 Seguridad y Roles
+## 🛡 Security & Roles
 The system uses RBAC (Role-Based Access Control).
 
 | Role          | Permissions                                                     |
@@ -98,5 +100,5 @@ The system uses RBAC (Role-Based Access Control).
 | Moderator    | View map, Create/Edit places directly, Approve requests.  |
 | Admin        | All of the above + Manage users and assign roles.       |
 
-## 📄 Licencia
+## 📄 License
 Proprietary software owned by José Rodrigo Carreón Cardona. All rights reserved.
