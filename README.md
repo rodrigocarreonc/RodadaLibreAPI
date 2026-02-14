@@ -23,10 +23,10 @@ The core of the system ensures data integrity for geospatial points. To guarante
 ```mermaid
 graph TD
     User((Cyclist)) -->|POST /places| API{Has Role?}
-    API --> |No (User)| DB1[(ChangeRequests)]
-    API --> |Yes (Mod/Admin)| DB2[(Places)]
+    API --> |No(User)|DB1[(ChangeRequests)]
+    API --> |Yes(Mod/Admin)|DB2[(Places)]
     
-    DB1 -->|Pending| Moderator((Moderator))
+    DB1 -->|Pending|Moderator((Moderator))
     Moderator -->|Approve| DB2
     Moderator -->|Reject| Trash[Trash / Cleanup]
 ```
