@@ -33,12 +33,21 @@ class PhotoController extends Controller
             $data = $request->validate(Photo::createValidation(), Photo::createMessageErrors());
             $path = $request->file('image')->store('photos', 'public');
 
-            $photo = Photo::create([
-                'url_source' => asset('storage/'.$path),
-                'status' => 'pending',
-                'place_id' => null
-            ]);
-
+            $user = auth()->user();
+            if($user->hasAnyRole(['admin', 'moderator'])){
+                $photo = Photo::create([
+                    'url_source' => asset('storage/'.$path),
+                    'status' => 'approved',
+                    'place_id' => null
+                ]);
+            }else{
+                $photo = Photo::create([
+                    'url_source' => asset('storage/'.$path),
+                    'status' => 'pending',
+                    'place_id' => null
+                ]);
+            }
+            
             return response()->json([
                 "message" => "Photo uploaded successfully",
                 "photo" => $photo
