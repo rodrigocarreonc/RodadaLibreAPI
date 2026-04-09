@@ -22,16 +22,19 @@ class Photo extends Model
 
     public static function createValidation(){
         return [
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:5120'
+            'images'   => 'required|array|max:5',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120'
         ];
     }
 
     public static function createMessageErrors(){
         return [
-            'image.required' => 'Image file is required.',
-            'image.image' => 'The file must be an image.',
-            'image.mimes' => 'The image must be a file of type: jpeg, png, jpg.',
-            'image.max' => 'The image size must not exceed 5MB.'
+            'images.required' => 'Debes subir al menos una imagen.',
+            'images.array'    => 'El formato de las imágenes no es válido.',
+            'images.max'      => 'No puedes subir más de 5 imágenes a la vez.',
+            'images.*.image'  => 'Uno de los archivos no es una imagen válida.',
+            'images.*.mimes'  => 'Las imágenes deben ser de tipo: jpeg, png, jpg, webp.',
+            'images.*.max'    => 'Una de las imágenes supera el tamaño máximo de 5MB.',
         ];
     }
 }
