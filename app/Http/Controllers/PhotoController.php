@@ -29,32 +29,35 @@ class PhotoController extends Controller
      */
     public function upload(Request $request)
     {
-        try{
-            $data = $request->validate(Photo::createValidation(), Photo::createMessageErrors());
-            $path = $request->file('image')->store('photos', 'public');
+        try {
+            $request->validate(Photo::createValidation(), Photo::createMessageErrors());
 
             $user = auth()->user();
-            if($user->hasAnyRole(['admin', 'moderator'])){
-                $photo = Photo::create([
-                    'url_source' => asset('storage/'.$path),
-                    'status' => 'approved',
-                    'place_id' => null
-                ]);
-            }else{
-                $photo = Photo::create([
-                    'url_source' => asset('storage/'.$path),
-                    'status' => 'pending',
-                    'place_id' => null
-                ]);
-            }
             
+            $status = $user->hasAnyRole(['admin', 'moderator']) ? 'approved' : 'pending';
+
+            $uploadedPhotos = [];
+
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('photos', 'public');
+
+                    $photo = Photo::create([
+                        'url_source' => asset('storage/' . $path),
+                        'status' => $status,
+                        'place_id' => null
+                    ]);
+
+                    $uploadedPhotos[] = $photo;
+                }
+            }
+
             return response()->json([
-                "message" => "Photo uploaded successfully",
-                "photo" => $photo
+                "message" => "Photos uploaded successfully",
+                "photos" => $uploadedPhotos
             ], 201);
 
-        }
-        catch(ValidationException $e){
+        } catch (ValidationException $e) {
             return response()->json([
                 "message" => "Validation failed",
                 "errors" => $e->errors()
