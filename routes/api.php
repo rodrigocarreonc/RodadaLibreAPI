@@ -1,31 +1,29 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\PlaceController;
-use App\Http\Controllers\PhotoController;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\ChangeRequestController;
 use App\Http\Controllers\Admin\UserRoleController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\PlaceController;
+use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->group(function (){
+Route::prefix('v1')->group(function () {
     Route::get('/places', [PlaceController::class, 'index']);
 
-    Route::group(['middleware' => 'auth:api'],function ($router){
+    Route::group(['middleware' => 'auth:api'], function ($router) {
         Route::post('/places', [PlaceController::class, 'store']);
         Route::put('/places/{place}', [PlaceController::class, 'update']);
         Route::delete('/places/{place}', [PlaceController::class, 'destroy']);
-        
+
         Route::post('/photos/upload', [PhotoController::class, 'upload']);
 
-        Route::middleware(['role:admin|moderator'])->prefix('moderation')->group(function(){
+        Route::middleware(['role:admin|moderator'])->prefix('moderation')->group(function () {
             Route::get('/requests', [ChangeRequestController::class, 'index']);
             Route::post('/requests/{id}/approve', [ChangeRequestController::class, 'approve']);
             Route::post('/requests/{id}/reject', [ChangeRequestController::class, 'reject']);
         });
 
-        Route::middleware(['role:admin'])->prefix('admin')->group(function(){
+        Route::middleware(['role:admin'])->prefix('admin')->group(function () {
             Route::get('/users', [UserRoleController::class, 'index']);
             Route::put('/users/{id}/role', [UserRoleController::class, 'updateRole']);
         });

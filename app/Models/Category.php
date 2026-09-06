@@ -10,7 +10,8 @@ class Category extends Model
 
     protected $filleable = ['name', 'slug'];
 
-    public function places(){
+    public function places()
+    {
         return $this->hasMany(Places::class);
     }
 }

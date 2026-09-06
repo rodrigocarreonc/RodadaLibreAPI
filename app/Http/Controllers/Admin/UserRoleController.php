@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-use App\Http\Controllers\Controller;
-use App\Http\Resources\UserResource;
-
-use App\Models\User;
-use Spatie\Permission\Models\Role;
-
 class UserRoleController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $users = User::with('roles')->get();
+
         return UserResource::collection($users);
     }
 
-    public function updateRole(Request $request, $id){
-        try{
+    public function updateRole(Request $request, $id)
+    {
+        try {
             $user = User::find($id);
 
-            if(!$user){
+            if (! $user) {
                 return response()->json(['message' => 'User not found'], 404);
             }
 
@@ -36,14 +36,13 @@ class UserRoleController extends Controller
             $user->syncRoles($newRole);
 
             return response()->json([
-                "message" => "User role updated successfully",
-                "user" => new UserResource($user->load('roles'))
+                'message' => 'User role updated successfully',
+                'user' => new UserResource($user->load('roles')),
             ]);
-        }
-        catch(ValidationException $e){
+        } catch (ValidationException $e) {
             return response()->json([
-                "message" => "Validation failed",
-                "errors" => $e->errors()
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
             ], 422);
         }
     }
