@@ -27,7 +27,7 @@ class PlaceResource extends JsonResource
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
 
-            'photos' => $this->photos->pluck('url_source')
+            'photos' => $this->photos->pluck('url_source'),
         ];
     }
 }

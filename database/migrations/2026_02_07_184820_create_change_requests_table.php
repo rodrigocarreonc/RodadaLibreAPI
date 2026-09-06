@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('change_requests', function (Blueprint $table) {
             $table->id();
-            
+
             $table->enum('action_type', ['create', 'update', 'delete']);
             $table->json('payload')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
@@ -21,7 +21,7 @@ return new class extends Migration
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('place_id')->nullable()->constrained()->onDelete('cascade');
-            
+
             $table->timestamps();
         });
     }

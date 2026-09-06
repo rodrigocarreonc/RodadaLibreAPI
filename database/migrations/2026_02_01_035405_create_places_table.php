@@ -14,16 +14,16 @@ return new class extends Migration
         Schema::create('places', function (Blueprint $table) {
             $table->id();
 
-            //General info
+            // General info
             $table->string('name');
             $table->text('description')->nullable();
 
-            //Specific info
+            // Specific info
             $table->string('schedule')->nullable();
             $table->integer('capacity')->nullable();
             $table->decimal('cost', 10, 2)->nullable();
 
-            //Location coordinates
+            // Location coordinates
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
 

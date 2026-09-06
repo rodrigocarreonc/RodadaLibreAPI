@@ -33,7 +33,7 @@ class PhotoController extends Controller
             $request->validate(Photo::createValidation(), Photo::createMessageErrors());
 
             $user = auth()->user();
-            
+
             $status = $user->hasAnyRole(['admin', 'moderator']) ? 'approved' : 'pending';
 
             $uploadedPhotos = [];
@@ -43,9 +43,9 @@ class PhotoController extends Controller
                     $path = $image->store('photos', 'public');
 
                     $photo = Photo::create([
-                        'url_source' => asset('storage/' . $path),
+                        'url_source' => asset('storage/'.$path),
                         'status' => $status,
-                        'place_id' => null
+                        'place_id' => null,
                     ]);
 
                     $uploadedPhotos[] = $photo;
@@ -53,14 +53,14 @@ class PhotoController extends Controller
             }
 
             return response()->json([
-                "message" => "Photos uploaded successfully",
-                "photos" => $uploadedPhotos
+                'message' => 'Photos uploaded successfully',
+                'photos' => $uploadedPhotos,
             ], 201);
 
         } catch (ValidationException $e) {
             return response()->json([
-                "message" => "Validation failed",
-                "errors" => $e->errors()
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
             ], 422);
         }
     }

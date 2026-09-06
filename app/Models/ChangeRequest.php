@@ -11,7 +11,7 @@ class ChangeRequest extends Model
     protected $fillable = ['action_type', 'payload', 'status', 'admin_comment', 'user_id', 'place_id'];
 
     protected $casts = [
-        'payload' => 'array', 
+        'payload' => 'array',
     ];
 
     public function user()

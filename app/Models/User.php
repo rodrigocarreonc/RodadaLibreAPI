@@ -3,16 +3,17 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Traits\HasRoles;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -68,16 +69,18 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public static function validations(){
+    public static function validations()
+    {
         return [
-            "role" => "required|exists:roles,name",
+            'role' => 'required|exists:roles,name',
         ];
     }
 
-    public static function messageErrors(){
+    public static function messageErrors()
+    {
         return [
-            "role.required" => "The role field is required.",
-            "role.exists" => "The selected role is invalid.",
+            'role.required' => 'The role field is required.',
+            'role.exists' => 'The selected role is invalid.',
         ];
     }
 }

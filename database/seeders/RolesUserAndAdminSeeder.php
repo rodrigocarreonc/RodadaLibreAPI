@@ -2,12 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-
-use App\Models\User;
 
 class RolesUserAndAdminSeeder extends Seeder
 {
@@ -16,9 +13,9 @@ class RolesUserAndAdminSeeder extends Seeder
      */
     public function run(): void
     {
-        $roleUser       = Role::firstOrCreate(['name' => 'user']);
+        $roleUser = Role::firstOrCreate(['name' => 'user']);
         $roleModerator = Role::firstOrCreate(['name' => 'moderator']);
-        $roleAdmin      = Role::firstOrCreate(['name' => 'admin']);
+        $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
 
         $admin = User::create([
             'name' => env('SEED_ADMIN_NAME'),
@@ -37,9 +34,9 @@ class RolesUserAndAdminSeeder extends Seeder
         $moderator->assignRole($roleModerator);
 
         $user = User::create([
-            "name" => env('SEED_USER_NAME'),
-            "email" => env('SEED_USER_EMAIL'),
-            "password" => env('SEED_USER_PASSWORD'),
+            'name' => env('SEED_USER_NAME'),
+            'email' => env('SEED_USER_EMAIL'),
+            'password' => env('SEED_USER_PASSWORD'),
         ]);
 
         $user->assignRole($roleUser);

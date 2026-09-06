@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\ChangeRequest;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RequestResource;
+use App\Models\ChangeRequest;
 use App\Models\Place;
+use Illuminate\Http\Request;
 
 class ChangeRequestController extends Controller
 {
@@ -16,15 +16,15 @@ class ChangeRequestController extends Controller
     public function index(Request $request)
     {
         $changeRequests = ChangeRequest::where('status', 'pending')
-        ->with(['user','place'])
-        ->orderBy('created_at', 'asc')->get();
+            ->with(['user', 'place'])
+            ->orderBy('created_at', 'asc')->get();
 
-        if($request->has('status')){
+        if ($request->has('status')) {
             $status = $request->query('status');
             $changeRequests = $changeRequests->where('status', $status)->values();
         }
 
-        if($request->has('action')){
+        if ($request->has('action')) {
             $action = $request->query('action');
             $changeRequests = $changeRequests->where('action_type', $action)->values();
         }
@@ -47,24 +47,20 @@ class ChangeRequestController extends Controller
     {
         $request = ChangeRequest::findOrFail($id);
 
-        if($request->status !== 'pending'){
+        if ($request->status !== 'pending') {
             return response()->json(['message' => 'Request already processed'], 400);
         }
 
         $data = $request->payload;
 
-        if($request->action_type === 'create'){
+        if ($request->action_type === 'create') {
             $place = Place::create(collect($data)->except('photos_ids')->toArray());
             $this->syncPhotos($place->$id, $data['photos_ids'] ?? []);
-        }
-
-        else if($request->action_type === 'update'){
+        } elseif ($request->action_type === 'update') {
             $place = Place::findOrFail($request->place_id);
             $place->update(collect($data)->except('photos_ids')->toArray());
             $this->syncPhotos($place->$id, $data['photos_ids'] ?? []);
-        }
-
-        else if($request->action_type === 'delete'){
+        } elseif ($request->action_type === 'delete') {
             $place = Place::findOrFail($request->place_id);
             $place->delete();
         }
@@ -72,7 +68,7 @@ class ChangeRequestController extends Controller
         $request->update(['status' => 'approved']);
 
         return response()->json([
-            "message" => "Change request approved and applied successfully"
+            'message' => 'Change request approved and applied successfully',
         ], 200);
 
     }
@@ -84,45 +80,45 @@ class ChangeRequestController extends Controller
     {
         $changeRequest = ChangeRequest::find($id);
 
-        if(!$changeRequest){
+        if (! $changeRequest) {
             return response()->json(['message' => 'Request not found'], 404);
         }
 
-        if($changeRequest->status !== 'pending'){
+        if ($changeRequest->status !== 'pending') {
             return response()->json(['message' => 'Request already processed'], 400);
         }
 
-        if(isset($changeRequest->payload['photos_ids'])){
+        if (isset($changeRequest->payload['photos_ids'])) {
             $photos = Photo::withoutGlobalScope('approved')
-                    ->whereIn('id', $changeRequest->payload['photos_ids'])
-                    ->get();
-            
+                ->whereIn('id', $changeRequest->payload['photos_ids'])
+                ->get();
+
             foreach ($photos as $photo) {
                 $path = str_replace(asset('storage/'), '', $photo->url_source);
                 Storage::disk('public')->delete($path);
                 $photo->delete();
-                    
+
             }
         }
 
         $changeRequest->update([
             'status' => 'rejected',
-            'admin_comment' => $request->input('admin_comment', 'No comment provided')
+            'admin_comment' => $request->input('admin_comment', 'No comment provided'),
         ]);
 
         return response()->json([
-            "message" => "Change request rejected successfully"
+            'message' => 'Change request rejected successfully',
         ], 200);
     }
 
     private function syncPhotos($placeId, $photoIds)
     {
-        if (!empty($photoIds)) {
+        if (! empty($photoIds)) {
             Photo::withoutGlobalScope('approved')
                 ->whereIn('id', $photoIds)
                 ->update([
                     'place_id' => $placeId,
-                    'status' => 'approved'
+                    'status' => 'approved',
                 ]);
         }
     }

@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -22,7 +21,7 @@ class AuthController extends Controller
     /**
      * Get a JWT via given credentials.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function login()
     {
@@ -35,7 +34,8 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
-    public function register(Request $request){
+    public function register(Request $request)
+    {
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -56,7 +56,7 @@ class AuthController extends Controller
     /**
      * Get the authenticated User.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function me()
     {
@@ -66,7 +66,7 @@ class AuthController extends Controller
     /**
      * Log the user out (Invalidate the token).
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function logout()
     {
@@ -78,7 +78,7 @@ class AuthController extends Controller
     /**
      * Refresh a token.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function refresh()
     {
@@ -88,16 +88,15 @@ class AuthController extends Controller
     /**
      * Get the token array structure.
      *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
+     * @param  string  $token
+     * @return JsonResponse
      */
     protected function respondWithToken($token)
     {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth()->factory()->getTTL() * 60,
         ]);
     }
 }
