@@ -21,7 +21,8 @@ class RequestResource extends JsonResource
             'status' => $this->status,
             'user' => [
                 'id' => $this->user->id,
-                'name' => $this->user->name,
+                'first_name' => $this->user->first_name,
+                'last_name' => $this->user->last_name,
                 'email' => $this->user->email,
             ],
             'place' => [

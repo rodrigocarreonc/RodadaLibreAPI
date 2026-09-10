@@ -18,7 +18,8 @@ class RolesUserAndAdminSeeder extends Seeder
         $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
 
         $admin = User::create([
-            'name' => env('SEED_ADMIN_NAME'),
+            'first_name' => env('SEED_ADMIN_FIRST_NAME'),
+            'last_name' => env('SEED_ADMIN_LAST_NAME'),
             'email' => env('SEED_ADMIN_EMAIL'),
             'password' => env('SEED_ADMIN_PASSWORD'),
         ]);
@@ -26,7 +27,8 @@ class RolesUserAndAdminSeeder extends Seeder
         $admin->assignRole($roleAdmin);
 
         $moderator = User::create([
-            'name' => env('SEED_MODERATOR_NAME'),
+            'first_name' => env('SEED_MODERATOR_FIRST_NAME'),
+            'last_name' => env('SEED_MODERATOR_LAST_NAME'),
             'email' => env('SEED_MODERATOR_EMAIL'),
             'password' => env('SEED_MODERATOR_PASSWORD'),
         ]);
@@ -34,7 +36,8 @@ class RolesUserAndAdminSeeder extends Seeder
         $moderator->assignRole($roleModerator);
 
         $user = User::create([
-            'name' => env('SEED_USER_NAME'),
+            'first_name' => env('SEED_USER_FIRST_NAME'),
+            'last_name' => env('SEED_USER_LAST_NAME'),
             'email' => env('SEED_USER_EMAIL'),
             'password' => env('SEED_USER_PASSWORD'),
         ]);

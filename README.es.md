@@ -73,15 +73,18 @@ php artisan storage:link
 Edita el archivo *.env* y agrega las variables de entorno para cada credencial de usuario, moderador y administrador
 ```code
 # Seed admin details
-SEED_ADMIN_NAME="admin_name"
+SEED_ADMIN_FIRST_NAME="admin_first_name"
+SEED_ADMIN_LAST_NAME="admin_last_name"
 SEED_ADMIN_EMAIL="admin@example.com"
 SEED_ADMIN_PASSWORD="admin123"
 
-SEED_MODERATOR_NAME="moderator_name"
+SEED_MODERATOR_FIRST_NAME="moderator_first_name"
+SEED_MODERATOR_LAST_NAME="moderator_last_name"
 SEED_MODERATOR_EMAIL="mod@example.com"
 SEED_MODERATOR_PASSWORD="mod123"
 
-SEED_USER_NAME="user_name"
+SEED_USER_FIRST_NAME="user_first_name"
+SEED_USER_LAST_NAME="user_last_name"
 SEED_USER_EMAIL="user@example.com"
 SEED_USER_PASSWORD="user123"
 ```
