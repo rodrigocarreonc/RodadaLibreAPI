@@ -65,6 +65,21 @@ class AuthController extends Controller
         return response()->json(auth()->user());
     }
 
+    public function update(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'first_name' => 'sometimes|required|string|max:255',
+            'last_name' => 'sometimes|required|string|max:255',
+            'password' => 'sometimes|required|string|min:6|confirmed',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json($user->fresh());
+    }
+
     /**
      * Log the user out (Invalidate the token).
      *
