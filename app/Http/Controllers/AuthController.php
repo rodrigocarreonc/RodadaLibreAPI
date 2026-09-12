@@ -80,6 +80,16 @@ class AuthController extends Controller
         return response()->json($user->fresh());
     }
 
+    public function destroy()
+    {
+        $user = auth()->user();
+
+        auth()->logout();
+        $user->delete();
+
+        return response()->json(['message' => 'Account deleted successfully']);
+    }
+
     /**
      * Log the user out (Invalidate the token).
      *
