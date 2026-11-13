@@ -1,8 +1,9 @@
 name: CI/CD Pipeline for Laravel 12 to Azure
 
 on:
-  pull_request:
-    branches: [ "main"]
+  # Un merge a main llega como push; los PRs solo corren checks.yml
+  push:
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
