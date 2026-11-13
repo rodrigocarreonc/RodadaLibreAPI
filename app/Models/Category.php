@@ -8,10 +8,10 @@ class Category extends Model
 {
     protected $table = 'categories';
 
-    protected $filleable = ['name', 'slug'];
+    protected $fillable = ['name', 'slug'];
 
     public function places()
     {
-        return $this->hasMany(Places::class);
+        return $this->hasMany(Place::class);
     }
 }
