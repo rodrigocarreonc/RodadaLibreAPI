@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RequestResource;
 use App\Models\ChangeRequest;
+use App\Models\Photo;
 use App\Models\Place;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ChangeRequestController extends Controller
 {
@@ -54,12 +56,12 @@ class ChangeRequestController extends Controller
         $data = $request->payload;
 
         if ($request->action_type === 'create') {
-            $place = Place::create(collect($data)->except('photos_ids')->toArray());
-            $this->syncPhotos($place->$id, $data['photos_ids'] ?? []);
+            $place = Place::create(collect($data)->except('photo_ids')->toArray());
+            $this->syncPhotos($place->id, $data['photo_ids'] ?? []);
         } elseif ($request->action_type === 'update') {
             $place = Place::findOrFail($request->place_id);
-            $place->update(collect($data)->except('photos_ids')->toArray());
-            $this->syncPhotos($place->$id, $data['photos_ids'] ?? []);
+            $place->update(collect($data)->except('photo_ids')->toArray());
+            $this->syncPhotos($place->id, $data['photo_ids'] ?? []);
         } elseif ($request->action_type === 'delete') {
             $place = Place::findOrFail($request->place_id);
             $place->delete();
@@ -88,9 +90,9 @@ class ChangeRequestController extends Controller
             return response()->json(['message' => 'Request already processed'], 400);
         }
 
-        if (isset($changeRequest->payload['photos_ids'])) {
+        if (isset($changeRequest->payload['photo_ids'])) {
             $photos = Photo::withoutGlobalScope('approved')
-                ->whereIn('id', $changeRequest->payload['photos_ids'])
+                ->whereIn('id', $changeRequest->payload['photo_ids'])
                 ->get();
 
             foreach ($photos as $photo) {
