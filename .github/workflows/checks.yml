@@ -1,0 +1,79 @@
+name: CI/CD Pipeline for Laravel 12 continuous integration
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # ==========================================
+  # PRUEBAS Y ANÁLISIS ESTÁTICO
+  # ==========================================
+  static-analysis:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: laravel_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=3
+
+    steps:
+      # Step 1: Check code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: PHP and Composer configuration
+      - name: Set up PHP and install Composer dependencies
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, pdo_mysql
+          coverage: none
+          tools: composer
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Set up the database environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+        # [NUEVO] Inyectamos las variables para conectar al MySQL efímero
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: laravel_test
+          DB_USERNAME: root
+          DB_PASSWORD: ""
+
+      - name: Run migrations and tests
+        run: |
+          php artisan migrate --force
+          php artisan test
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: laravel_test
+          DB_USERNAME: root
+          DB_PASSWORD: ""
+
+      - name: Run Laravel Pint
+        run: vendor/bin/pint --test

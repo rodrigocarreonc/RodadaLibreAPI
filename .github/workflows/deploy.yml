@@ -1,10 +1,9 @@
 name: CI/CD Pipeline for Laravel 12 to Azure
 
 on:
+  # Un merge a main llega como push; los PRs solo corren checks.yml
   push:
-    branches: [ "main", "dev" ]
-  pull_request:
-    branches: [ "main", "dev" ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -130,7 +129,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'rodadalibre' # RECUERDA REEMPLAZAR ESTO
-          slot-name: 'Production'
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          slot-name: ${{ secrets.AZURE_WEBAPP_SLOT_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: .
