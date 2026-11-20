@@ -11,19 +11,60 @@ use Illuminate\Validation\ValidationException;
 
 class PlaceController extends Controller
 {
+    private const NEARBY_RADIUS_KM = 30;
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $places = Place::all()->load('category', 'photos');
-
-        if ($request->has('category')) {
-            $categoryId = $request->query('category');
-            $places = $places->where('category_id', $categoryId)->values();
+        try {
+            $request->validate([
+                'lat' => 'nullable|required_with:lng|numeric|between:-90,90',
+                'lng' => 'nullable|required_with:lat|numeric|between:-180,180',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
         }
 
+        $query = Place::with('category', 'photos');
+
+        if ($request->has('category')) {
+            $query->where('category_id', $request->query('category'));
+        }
+
+        // Without a location, return everything so older app versions keep working
+        if (! $request->filled('lat')) {
+            return PlaceResource::collection($query->get());
+        }
+
+        $lat = (float) $request->query('lat');
+        $lng = (float) $request->query('lng');
+
+        // Bounding box in SQL first, then the exact distance in PHP on the few rows left
+        $latDelta = self::NEARBY_RADIUS_KM / 111.045;
+        $lngDelta = self::NEARBY_RADIUS_KM / (111.045 * max(cos(deg2rad($lat)), 0.01));
+
+        $places = $query
+            ->whereBetween('latitude', [$lat - $latDelta, $lat + $latDelta])
+            ->whereBetween('longitude', [$lng - $lngDelta, $lng + $lngDelta])
+            ->get()
+            ->filter(fn (Place $place) => self::distanceKm($lat, $lng, $place->latitude, $place->longitude) <= self::NEARBY_RADIUS_KM)
+            ->values();
+
         return PlaceResource::collection($places);
+    }
+
+    private static function distanceKm(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+
+        return 6371 * 2 * asin(min(1, sqrt($a)));
     }
 
     /**
