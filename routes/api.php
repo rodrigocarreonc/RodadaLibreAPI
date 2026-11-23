@@ -36,6 +36,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/refresh', [AuthController::class, 'refresh']);
         Route::post('/me', [AuthController::class, 'me']);
         Route::put('/me', [AuthController::class, 'update']);
+        Route::put('/me/password', [AuthController::class, 'updatePassword']);
         Route::delete('/me', [AuthController::class, 'destroy']);
     });
 });

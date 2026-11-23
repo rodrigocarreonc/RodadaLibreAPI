@@ -72,12 +72,23 @@ class AuthController extends Controller
         $validated = $request->validate([
             'first_name' => 'sometimes|required|string|max:255',
             'last_name' => 'sometimes|required|string|max:255',
-            'password' => 'sometimes|required|string|min:6|confirmed',
         ]);
 
         $user->update($validated);
 
         return response()->json($user->fresh());
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'current_password' => 'required|string|current_password:api',
+            'password' => 'required|string|min:6|confirmed|different:current_password',
+        ]);
+
+        auth()->user()->update(['password' => $validated['password']]);
+
+        return response()->json(['message' => 'Password updated successfully']);
     }
 
     public function destroy()
