@@ -91,8 +91,12 @@ class AuthController extends Controller
         return response()->json(['message' => 'Password updated successfully']);
     }
 
-    public function destroy()
+    public function destroy(Request $request)
     {
+        $request->validate([
+            'current_password' => 'required|string|current_password:api',
+        ]);
+
         $user = auth()->user();
 
         auth()->logout();
